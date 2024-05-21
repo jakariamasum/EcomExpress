@@ -1,9 +1,9 @@
-import express from 'express'
-import { productControllers } from './product.controller';
+import express from "express";
+import { productControllers } from "./product.controller";
 
-const router= express.Router();
+const router = express.Router();
 
-router.post('/products',productControllers.createProduct);
-router.get('/products',productControllers.getProducts);
+router.post("/products", productControllers.createProduct);
+router.get("/products/:productId?", productControllers.getProducts);
 
-export const productRoutes=router;
+export const productRoutes = router;
