@@ -19,6 +19,11 @@ const getProductsFromDB = async (searchTerm?: string) => {
   return products;
 };
 
+const getSingleProductFromDB = async (productId: string) => {
+  const result = await ProductModel.findOne({ _id: productId });
+  return result;
+};
+
 const updateProductInDB = async (
   productId: string,
   updateData: Partial<Product>
@@ -39,6 +44,7 @@ const deleteProductFromDB = async (productId: string) => {
 export const productServices = {
   createProductToDB,
   getProductsFromDB,
+  getSingleProductFromDB,
   updateProductInDB,
   deleteProductFromDB,
 };
