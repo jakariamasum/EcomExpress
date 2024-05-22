@@ -45,11 +45,20 @@ This repository contains an e-commerce application built using Express.js, TypeS
    npm install
    ```
 
-3. Start MongoDB server.
+3. Set up environment variables
+   Create a .env file in the root of your project with the following contents:
 
-4. Run the application:
    ```bash
-   npm run build
+   Copy code
+   PORT= 5000
+   DATABASE_URL= mongodb://localhost:27017/your-database-name
+   ```
+
+4. Start MongoDB server.
+
+5. Run the application:
+   ```bash
+   npm run start:dev
    ```
 
 ### API Endpoints
