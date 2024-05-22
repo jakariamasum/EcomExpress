@@ -10,10 +10,6 @@ const OrderSchema = new Schema<Order>({
     type: String,
     required: true,
   },
-  productName: {
-    type: String,
-    required: true,
-  },
   price: {
     type: Number,
     required: true,

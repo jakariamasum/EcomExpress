@@ -36,6 +36,16 @@ const updateProductInDB = async (
   return updatedProduct;
 };
 
+const updateProductInventory = async (productId: string, quantity: number) => {
+  const product = await ProductModel.findById(productId);
+  if (product) {
+    product.inventory.quantity -= quantity;
+    product.inventory.inStock = product.inventory.quantity > 0;
+    await product.save();
+  }
+  return product;
+};
+
 const deleteProductFromDB = async (productId: string) => {
   const deletedProduct = await ProductModel.findByIdAndDelete(productId);
   return deletedProduct;
@@ -47,4 +57,5 @@ export const productServices = {
   getSingleProductFromDB,
   updateProductInDB,
   deleteProductFromDB,
+  updateProductInventory,
 };
