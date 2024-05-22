@@ -37,7 +37,7 @@ This repository contains an e-commerce application built using Express.js, TypeS
 1. Clone the repository:
    ```bash
    git clone https://github.com/jakariamasum/EcomExpress
-   cd ecommerce-app
+   cd EcomExpress
    ```
 
 2. Install dependencies:
