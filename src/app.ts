@@ -12,6 +12,6 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
 });
 
-app.use('/api',productRoutes)
+app.use('/api/products',productRoutes)
 app.use('/api/orders',OrderRoutes)
 export default app;
