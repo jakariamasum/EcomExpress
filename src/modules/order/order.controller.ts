@@ -1,10 +1,9 @@
 import { Request, Response } from "express";
 import { productServices } from "../product/product.service";
 import { OrderServices } from "./order.service";
-// import { ProductModel } from "../product/product.model";
 
 const createOrder = async (req: Request, res: Response) => {
-  const {productId,quantity } = req.body;
+  const { productId, quantity } = req.body;
   try {
     const product = await productServices.getSingleProductFromDB(productId);
     if (!product) {
@@ -20,15 +19,14 @@ const createOrder = async (req: Request, res: Response) => {
         message: "Insufficient quantity available in inventory",
       });
     }
-    await productServices.updateProductInventory(productId,quantity);
-    const result= await OrderServices.createOrderToDB(req.body);
+    await productServices.updateProductInventory(productId, quantity);
+    const result = await OrderServices.createOrderToDB(req.body);
 
     res.status(200).json({
-        success: true,
-        message: "Order created successfully!",
-        data: result
-    })
-
+      success: true,
+      message: "Order created successfully!",
+      data: result,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -37,6 +35,25 @@ const createOrder = async (req: Request, res: Response) => {
   }
 };
 
-export const OrderControllers={
-    createOrder,
-}
+const getOrders = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.query;
+    const result = await OrderServices.getOrdersFromDB(email as string);
+    res.status(200).json({
+      success: true,
+      message: "Orders fetched successfully!",
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+      data: error,
+    });
+  }
+};
+
+export const OrderControllers = {
+  createOrder,
+  getOrders,
+};
