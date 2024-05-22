@@ -1,10 +1,21 @@
 import { Request, Response } from "express";
 import { productServices } from "./product.service";
+import { ProductSchemaValidationZod } from "./product.validation";
 
 const createProduct = async (req: Request, res: Response) => {
+  const validationResult = ProductSchemaValidationZod.safeParse(req.body);
+
+  if (!validationResult.success) {
+    return res.status(400).json({
+      success: false,
+      errors: validationResult.error,
+    });
+  }
   try {
     const product = req.body;
-    const result = await productServices.createProductToDB(product);
+    const result = await productServices.createProductToDB(
+      validationResult.data
+    );
     res.status(200).json({
       success: true,
       message: "Product created successfully!",
@@ -25,11 +36,18 @@ const getProducts = async (req: Request, res: Response) => {
     const result = await productServices.getProductsFromDB(
       searchTerm as string
     );
-    res.status(200).json({
-      success: true,
-      message: "Products fetched successfully!",
-      data: result,
-    });
+    if (result.length > 0) {
+      res.status(200).json({
+        success: true,
+        message: "Products fetched successfully!",
+        data: result,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -43,11 +61,19 @@ const getSingleProduct = async (req: Request, res: Response) => {
   try {
     const { productId } = req.params;
     const result = await productServices.getSingleProductFromDB(productId);
-    res.status(200).json({
-      success: true,
-      message: "Products fetched successfully!",
-      data: result,
-    });
+    console.log(result);
+    if (result) {
+      res.status(200).json({
+        success: true,
+        message: "Products fetched successfully!",
+        data: result,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -61,9 +87,21 @@ const updateProduct = async (req: Request, res: Response) => {
   try {
     const { productId } = req.params;
     const updateData = req.body;
+    const PartialProductSchemaValidationZod =
+      ProductSchemaValidationZod.partial();
+
+    const validationResult =
+      PartialProductSchemaValidationZod.safeParse(updateData);
+
+    if (!validationResult.success) {
+      return res.status(400).json({
+        success: false,
+        errors: validationResult.error.errors.map((err) => err.message),
+      });
+    }
     const result = await productServices.updateProductInDB(
       productId,
-      updateData
+      validationResult.data
     );
     if (result) {
       res.status(200).json({

@@ -1,9 +1,19 @@
 import { Request, Response } from "express";
 import { productServices } from "../product/product.service";
 import { OrderServices } from "./order.service";
+import { OrderSchemaValidationZod } from "./order.validation";
 
 const createOrder = async (req: Request, res: Response) => {
-  const { productId, quantity } = req.body;
+  const validationResult = OrderSchemaValidationZod.safeParse(req.body);
+
+  if (!validationResult.success) {
+    return res.status(400).json({
+      success: false,
+      errors: validationResult.error,
+    });
+  }
+
+  const { productId, quantity } = validationResult.data;
   try {
     const product = await productServices.getSingleProductFromDB(productId);
     if (!product) {
@@ -20,7 +30,7 @@ const createOrder = async (req: Request, res: Response) => {
       });
     }
     await productServices.updateProductInventory(productId, quantity);
-    const result = await OrderServices.createOrderToDB(req.body);
+    const result = await OrderServices.createOrderToDB(validationResult.data);
 
     res.status(200).json({
       success: true,
