@@ -3,7 +3,8 @@ import { productServices } from "./product.service";
 import { ProductSchemaValidationZod } from "./product.validation";
 
 const createProduct = async (req: Request, res: Response) => {
-  const validationResult = ProductSchemaValidationZod.safeParse(req.body);
+  const product = req.body;
+  const validationResult = ProductSchemaValidationZod.safeParse(product);
 
   if (!validationResult.success) {
     return res.status(400).json({
@@ -12,7 +13,6 @@ const createProduct = async (req: Request, res: Response) => {
     });
   }
   try {
-    const product = req.body;
     const result = await productServices.createProductToDB(
       validationResult.data
     );
