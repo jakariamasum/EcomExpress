@@ -26,31 +26,32 @@ const InventorySchema = new Schema<Inventory>({
 const productSchema = new Schema<Product>({
   name: {
     type: String,
+    unique: true,
     required: [true, "Product name is required"],
   },
   description: {
     type: String,
     required: [true, "Product description is required"],
   },
-  category: {
-    type: String,
-    required: [true, "Product category is required"],
-  },
   price: {
     type: Number,
     required: [true, "Product price is required"],
+  },
+  category: {
+    type: String,
+    required: [true, "Product category is required"],
   },
   tags: {
     type: [String],
     required: [true, "Product tags are required"],
   },
-  inventory: {
-    type: InventorySchema,
-    required: [true, "Inventory information is required"],
-  },
   variants: {
     type: [VariantSchema],
     required: [true, "Product variants are required"],
+  },
+  inventory: {
+    type: InventorySchema,
+    required: [true, "Inventory information is required"],
   },
 });
 

@@ -37,7 +37,7 @@ const ProductSchemaValidationZod = z.object({
   price: z.number().min(0, "Price must be a positive number"),
   tags: z.array(z.string().trim()).nonempty("At least one tag is required"),
   inventory: InventorySchemaValidationZod,
-  variants: z.array(VariantSchemaValidationZod),
+  variants: z.array(VariantSchemaValidationZod).nonempty("At least one variant is required"),
 });
 
 export { ProductSchemaValidationZod };

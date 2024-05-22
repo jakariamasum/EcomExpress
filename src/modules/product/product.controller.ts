@@ -1,17 +1,29 @@
 import { Request, Response } from "express";
 import { productServices } from "./product.service";
 import { ProductSchemaValidationZod } from "./product.validation";
+import { ProductModel } from "./product.model";
 
 const createProduct = async (req: Request, res: Response) => {
   const product = req.body;
   const validationResult = ProductSchemaValidationZod.safeParse(product);
-
+  const existingProduct = await productServices.getSingleProductByNameFromDB(
+    product.name
+  );
+  //check product existing
+  if (existingProduct) {
+    return res.status(400).json({
+      success: false,
+      message: "Product name must be unique",
+    });
+  }
+  //if validation failed send error mesage
   if (!validationResult.success) {
     return res.status(400).json({
       success: false,
       errors: validationResult.error,
     });
   }
+  //create new product if there is no error
   try {
     const result = await productServices.createProductToDB(
       validationResult.data
@@ -37,9 +49,12 @@ const getProducts = async (req: Request, res: Response) => {
       searchTerm as string
     );
     if (result.length > 0) {
+      const message = searchTerm
+        ? `Products matching search term ${searchTerm} fetched successfully!`
+        : "Products fetched successfully!";
       res.status(200).json({
         success: true,
-        message: "Products fetched successfully!",
+        message: message,
         data: result,
       });
     } else {
@@ -61,15 +76,15 @@ const getSingleProduct = async (req: Request, res: Response) => {
   try {
     const { productId } = req.params;
     const result = await productServices.getSingleProductFromDB(productId);
-    console.log(result);
+
     if (result) {
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
-        message: "Products fetched successfully!",
+        message: "Product fetched successfully!",
         data: result,
       });
     } else {
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
         message: "Product not found",
       });
@@ -90,15 +105,30 @@ const updateProduct = async (req: Request, res: Response) => {
     const PartialProductSchemaValidationZod =
       ProductSchemaValidationZod.partial();
 
+    // check whether update product name already exits or not
+    const existingProduct = await productServices.getSingleProductByNameFromDB(
+      updateData?.name
+    );
+    if (existingProduct) {
+      return res.status(400).json({
+        success: false,
+        message: "Product name must be unique",
+      });
+    }
+
+    //validate update data
     const validationResult =
       PartialProductSchemaValidationZod.safeParse(updateData);
 
+    //if validation failed send error message
     if (!validationResult.success) {
       return res.status(400).json({
         success: false,
         errors: validationResult.error.errors.map((err) => err.message),
       });
     }
+
+    //update product data if no error exits
     const result = await productServices.updateProductInDB(
       productId,
       validationResult.data
