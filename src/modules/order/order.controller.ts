@@ -10,7 +10,7 @@ const createOrder = async (req: Request, res: Response) => {
   if (!validationResult.success) {
     return res.status(400).json({
       success: false,
-      errors: validationResult.error,
+      errors: validationResult.error.errors.map((err) => err.message),
     });
   }
 

@@ -3,13 +3,12 @@ import { productRoutes } from "./modules/product/product.route";
 import cors from "cors";
 import { OrderRoutes } from "./modules/order/order.route";
 const app: Application = express();
-const port = 3000;
 
 app.use(express.json());
 app.use(cors());
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Hello World!");
+  res.send("Welcome to EcomExpress!");
 });
 
 app.use("/api/products", productRoutes);

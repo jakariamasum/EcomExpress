@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { productServices } from "./product.service";
 import { ProductSchemaValidationZod } from "./product.validation";
-import { ProductModel } from "./product.model";
 
 const createProduct = async (req: Request, res: Response) => {
   const product = req.body;
@@ -20,7 +19,7 @@ const createProduct = async (req: Request, res: Response) => {
   if (!validationResult.success) {
     return res.status(400).json({
       success: false,
-      errors: validationResult.error,
+      errors: validationResult.error.errors.map((err) => err.message),
     });
   }
   //create new product if there is no error
@@ -50,7 +49,7 @@ const getProducts = async (req: Request, res: Response) => {
     );
     if (result.length > 0) {
       const message = searchTerm
-        ? `Products matching search term ${searchTerm} fetched successfully!`
+        ? `Products matching search term '${searchTerm}' fetched successfully!`
         : "Products fetched successfully!";
       res.status(200).json({
         success: true,
@@ -106,6 +105,9 @@ const updateProduct = async (req: Request, res: Response) => {
       ProductSchemaValidationZod.partial();
 
     // check whether update product name already exits or not
+    if (updateData?.name) {
+      updateData.name = updateData.name.trim();
+    }
     const existingProduct = await productServices.getSingleProductByNameFromDB(
       updateData?.name
     );
